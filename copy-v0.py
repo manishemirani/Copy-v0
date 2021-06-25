@@ -12,6 +12,8 @@ from typing import Tuple
 classes = ["A", "B", "C", "D", "E", " "]
 env = gym.make("Copy-v0")  # making environment
 env.seed(1)
+np.random.seed(1)
+tf.random.set_seed(1)
 
 
 #  define a function for encoding observations
