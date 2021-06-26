@@ -1,3 +1,4 @@
+import os
 import gym
 import numpy as np
 import tensorflow as tf
@@ -72,7 +73,7 @@ def episode(model: tf.keras.Model,
         movement_probs = tf.nn.softmax(movement_logits)  # apply softmax function on movement logits
         movement_memory.append(movement_probs[0, movement])  # add movement to memory
 
-        write_output = tf.random.categorical(write_output_logits, 1)[0, 0].numpy()  # choose random write_oupu
+        write_output = tf.random.categorical(write_output_logits, 1)[0, 0].numpy()  # choose random write_ouput
         write_output_probs = tf.nn.softmax(write_output_logits)  # # apply softmax function on logits
         write_output_memory.append(write_output_probs[0, write_output])  # add  write_output to memory
 
@@ -159,6 +160,18 @@ def train_step(model: tf.keras.Model, optimizer: Optimizer,
     return total_reward
 
 
+num_classes = len(classes) - 1
+num_hidden_state = 100
+model = ActorModel(num_hidden_state, num_classes)
+optimizer = Adam(learning_rate=0.01)
+max_step_per_episode = 1000  # but in reality is 10!
+max_episodes = 3500
+
+checkpoint_dir = "./train_checks"
+checkpoint_prefix = os.path.join(checkpoint_dir, "ckpts")
+checkpoint = tf.train.Checkpoint(optimizer=optimizer,
+                                 model=model)
+
 reward = 0
 
 
@@ -169,6 +182,8 @@ def train(model, optimizer, max_step_per_episode,
         for i in ttr:
             episode_reward = int(train_step(model, optimizer, gamma,
                                             max_step_per_episode))
+            if i % 500 == 0:
+                checkpoint.save(file_prefix=checkpoint_prefix)
 
             episodes_reward.append(episode_reward)
             running_reward = statistics.mean(episodes_reward)
@@ -182,13 +197,26 @@ def train(model, optimizer, max_step_per_episode,
     print(f'[INFO] Solved at episode {i}: average reward: {running_reward:.2f}!')
 
 
-num_classes = len(classes) - 1
-num_hidden_state = 100
-model = ActorModel(num_hidden_state, num_classes)
-optimizer = Adam(learning_rate=0.01)
-max_step_per_episode = 1000  # but in reality is 10!
-max_episodes = 3500
-
 train(model=model, optimizer=optimizer,
       max_step_per_episode=max_step_per_episode,
       max_episodes=max_episodes)
+
+checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
+
+num_sample = 30
+observation = env.reset()
+for i in range(30):
+    env.render()
+    observation = encoder(observation)
+    movement, write_output, word, _ = model(observation)
+
+    movement = np.argmax(np.squeeze(movement))
+    write_output = np.argmax(np.squeeze(write_output))
+    word = np.argmax(np.squeeze(word))
+
+    action = (movement, write_output, word)
+
+    observation, _, done, _ = env.step(action)
+
+    if done:
+        observation = env.reset()
