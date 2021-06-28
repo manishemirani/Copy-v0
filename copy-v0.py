@@ -99,7 +99,7 @@ eps = np.finfo(np.float32).eps.item()
 
 def normalize(inputs):
     inputs -= tf.reduce_mean(inputs)
-    inputs /= (tf.math.reduce_std(inputs) + eps)  # add eps prevent to divided by zero
+    inputs /= (tf.math.reduce_std(inputs) + eps)  # add eps to preventing dividing by zero
 
     return tf.cast(inputs, dtype=tf.float32)
 
