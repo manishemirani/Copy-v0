@@ -164,7 +164,7 @@ num_classes = len(classes) - 1
 num_hidden_state = 100
 model = ActorModel(num_hidden_state, num_classes)
 optimizer = Adam(learning_rate=0.01)
-max_step_per_episode = 1000  # but in reality is 10!
+max_step_per_episode = 1000 
 max_episodes = 3500
 
 checkpoint_dir = "./train_checks"
