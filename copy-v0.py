@@ -172,9 +172,6 @@ checkpoint_prefix = os.path.join(checkpoint_dir, "ckpts")
 checkpoint = tf.train.Checkpoint(optimizer=optimizer,
                                  model=model)
 
-reward = 0
-
-
 def train(model, optimizer, max_step_per_episode,
           max_episodes, min_consecutive_episode=100, reward_threshold=25.72, gamma=0.5):
     episodes_reward: collections.deque = collections.deque(maxlen=min_consecutive_episode)
