@@ -183,6 +183,8 @@ checkpoint = tf.train.Checkpoint(optimizer=optimizer,
 def train(model, optimizer, max_step_per_episode,
           max_episodes, min_consecutive_episode=100, reward_threshold=25.72, gamma=0.5):
     episodes_reward: collections.deque = collections.deque(maxlen=min_consecutive_episode)
+    episodes_graph = []
+    episodes = []
     with tqdm.trange(max_episodes) as ttr:
         for i in ttr:
             episode_reward = int(train_step(model, optimizer, gamma,
@@ -199,12 +201,16 @@ def train(model, optimizer, max_step_per_episode,
 
             if running_reward >= reward_threshold and i >= min_consecutive_episode:
                 break
+            episodes_graph.append(episode_reward)
+            episodes.append(i)
     print(f'[INFO] Solved at episode {i}: average reward: {running_reward:.2f}!')
 
+    return episodes_graph, episodes
 
-train(model=model, optimizer=optimizer,
-      max_step_per_episode=max_step_per_episode,
-      max_episodes=max_episodes)
+
+graph_data, episodes = train(model=model, optimizer=optimizer,
+                             max_step_per_episode=max_step_per_episode,
+                             max_episodes=max_episodes)
 
 checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
