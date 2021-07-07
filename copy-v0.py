@@ -2,6 +2,7 @@ import os
 import gym
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
 import tqdm
 import statistics
 import collections
@@ -159,6 +160,13 @@ def train_step(model: tf.keras.Model, optimizer: Optimizer,
 
     return total_reward
 
+# def create_graph(episodes, rewards):
+#     plt.plot(episodes, rewards)
+#     plt.xlabel("Episodes")
+#     plt.ylabel("Rewards")
+#     plt.title("Copy-v0 on LSTM")
+#     plt.legend()
+#     plt.savefig("DQN.png")
 
 num_classes = len(classes) - 1
 num_hidden_state = 100
@@ -199,6 +207,8 @@ train(model=model, optimizer=optimizer,
       max_episodes=max_episodes)
 
 checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
+
+# create_graph(episodes, graph_data)
 
 num_sample = 30
 observation = env.reset()
