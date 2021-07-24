@@ -60,7 +60,7 @@ def episode(model: tf.keras.Model,
     values = []
     # define initial observation
     observation = env.reset()
-    for i in range(max_step):  # run until the done is True
+    for i in range(max_step):
 
         observation = encoder(observation)
         observation_labels.append(observation[:, :-1])
