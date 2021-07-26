@@ -17,6 +17,7 @@ env.seed(1)
 np.random.seed(1)
 tf.random.set_seed(1)
 
+num_actions = 2
 
 #  define a function for encoding observations
 def encoder(index_number):
@@ -34,7 +35,7 @@ class ActorModel(tf.keras.Model):
 
         self.hs = LSTM(num_hidden_state, return_sequences=True)  # define lstm
         self.flat = Flatten()  # flatten
-        self.movement = Dense(2)  # right or left
+        self.movement = Dense(num_actions)  # right or left
         self.write_output = Dense(2)  # true or false
         self.classification = Dense(num_classes)
         self.critic = Dense(1)
@@ -160,13 +161,13 @@ def train_step(model: tf.keras.Model, optimizer: Optimizer,
 
     return total_reward
 
-# def create_graph(episodes, rewards):
-#     plt.plot(episodes, rewards)
-#     plt.xlabel("Episodes")
-#     plt.ylabel("Rewards")
-#     plt.title("Copy-v0 on LSTM")
-#     plt.legend()
-#     plt.savefig("DQN.png")
+def create_graph(episodes, rewards):
+    plt.plot(episodes, rewards)
+    plt.xlabel("Episodes")
+    plt.ylabel("Rewards")
+    plt.title("Copy-v0 on LSTM")
+    plt.legend()
+    plt.savefig("DQN.png")
 
 num_classes = len(classes) - 1
 num_hidden_state = 100
@@ -214,7 +215,7 @@ graph_data, episodes = train(model=model, optimizer=optimizer,
 
 checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
-# create_graph(episodes, graph_data)
+create_graph(episodes, graph_data)
 
 num_sample = 30
 observation = env.reset()
