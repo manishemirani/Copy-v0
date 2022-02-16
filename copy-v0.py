@@ -1,23 +1,24 @@
 import os
-import gym
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import tqdm
 import statistics
 import collections
+import gym_algorithmic
 from tensorflow.keras.layers import Dense, LSTM, Flatten
 from tensorflow.keras.optimizers import Adam, Optimizer
 from tensorflow.keras.losses import CategoricalCrossentropy, Huber
 from typing import Tuple
 
 classes = ["A", "B", "C", "D", "E", " "]
-env = gym.make("Copy-v0")  # making environment
+env = gym_algorithmic.CopyEnv()  # making environment
 env.seed(1)
 np.random.seed(1)
 tf.random.set_seed(1)
 
 num_actions = 2
+
 
 #  define a function for encoding observations
 def encoder(index_number):
@@ -161,6 +162,7 @@ def train_step(model: tf.keras.Model, optimizer: Optimizer,
 
     return total_reward
 
+
 def create_graph(episodes, rewards):
     plt.plot(episodes, rewards)
     plt.xlabel("Episodes")
@@ -169,17 +171,19 @@ def create_graph(episodes, rewards):
     plt.legend()
     plt.savefig("DQN.png")
 
+
 num_classes = len(classes) - 1
 num_hidden_state = 100
 model = ActorModel(num_hidden_state, num_classes)
 optimizer = Adam(learning_rate=0.01)
-max_step_per_episode = 1000 
+max_step_per_episode = 1000
 max_episodes = 3500
 
 checkpoint_dir = "./train_checks"
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpts")
 checkpoint = tf.train.Checkpoint(optimizer=optimizer,
                                  model=model)
+
 
 def train(model, optimizer, max_step_per_episode,
           max_episodes, min_consecutive_episode=100, reward_threshold=25.72, gamma=0.5):
